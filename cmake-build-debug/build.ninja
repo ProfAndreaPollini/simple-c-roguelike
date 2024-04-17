@@ -57,6 +57,30 @@ build CMakeFiles/example.dir/main.c.obj: C_COMPILER__example_unscanned_Debug D$:
   OBJECT_DIR = CMakeFiles\example.dir
   OBJECT_FILE_DIR = CMakeFiles\example.dir
 
+build CMakeFiles/example.dir/timer.c.obj: C_COMPILER__example_unscanned_Debug D$:/Projects/CLionProjects/simple-c-roguelike/timer.c || cmake_object_order_depends_target_example
+  DEFINES = -DASSETS_PATH=\"D:/Projects/CLionProjects/simple-c-roguelike/assets/\" -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
+  DEP_FILE = CMakeFiles\example.dir\timer.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src/external/glfw/include
+  OBJECT_DIR = CMakeFiles\example.dir
+  OBJECT_FILE_DIR = CMakeFiles\example.dir
+
+build CMakeFiles/example.dir/entity.c.obj: C_COMPILER__example_unscanned_Debug D$:/Projects/CLionProjects/simple-c-roguelike/entity.c || cmake_object_order_depends_target_example
+  DEFINES = -DASSETS_PATH=\"D:/Projects/CLionProjects/simple-c-roguelike/assets/\" -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
+  DEP_FILE = CMakeFiles\example.dir\entity.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src/external/glfw/include
+  OBJECT_DIR = CMakeFiles\example.dir
+  OBJECT_FILE_DIR = CMakeFiles\example.dir
+
+build CMakeFiles/example.dir/gamemap.c.obj: C_COMPILER__example_unscanned_Debug D$:/Projects/CLionProjects/simple-c-roguelike/gamemap.c || cmake_object_order_depends_target_example
+  DEFINES = -DASSETS_PATH=\"D:/Projects/CLionProjects/simple-c-roguelike/assets/\" -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
+  DEP_FILE = CMakeFiles\example.dir\gamemap.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src -ID:/Projects/CLionProjects/simple-c-roguelike/cmake-build-debug/_deps/raylib-src/src/external/glfw/include
+  OBJECT_DIR = CMakeFiles\example.dir
+  OBJECT_FILE_DIR = CMakeFiles\example.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target example
@@ -65,7 +89,7 @@ build CMakeFiles/example.dir/main.c.obj: C_COMPILER__example_unscanned_Debug D$:
 #############################################
 # Link the executable example.exe
 
-build example.exe: C_EXECUTABLE_LINKER__example_Debug CMakeFiles/example.dir/main.c.obj | _deps/raylib-build/raylib/libraylib.a _deps/raylib-build/raylib/external/glfw/src/libglfw3.a || _deps/raylib-build/raylib/external/glfw/src/libglfw3.a _deps/raylib-build/raylib/libraylib.a
+build example.exe: C_EXECUTABLE_LINKER__example_Debug CMakeFiles/example.dir/main.c.obj CMakeFiles/example.dir/timer.c.obj CMakeFiles/example.dir/entity.c.obj CMakeFiles/example.dir/gamemap.c.obj | _deps/raylib-build/raylib/libraylib.a _deps/raylib-build/raylib/external/glfw/src/libglfw3.a || _deps/raylib-build/raylib/external/glfw/src/libglfw3.a _deps/raylib-build/raylib/libraylib.a
   FLAGS = -g
   LINK_LIBRARIES = _deps/raylib-build/raylib/libraylib.a  -lopengl32  -lglu32  -lwinmm  _deps/raylib-build/raylib/external/glfw/src/libglfw3.a  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\example.dir

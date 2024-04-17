@@ -18,6 +18,10 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include "timer.h"
+#include "entity.h"
+#include "constants.h"
+#include "gamemap.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -26,72 +30,24 @@
 //----------------------------------------------------------------------------------
 // Global Variables Definition
 //----------------------------------------------------------------------------------
-int screenWidth = 1600;
-int screenHeight = 900;
+
 
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
 void UpdateDrawFrame(void);     // Update and Draw one frame
 
+
 Texture2D spritesTexture;
 
 
-
-// constants
-#define SCALE 2.0f
-#define CELLS_X 49
-#define CELLS_Y 30
-#define SPRITESHET_WIDTH 49
-#define SPRITESHET_HEIGHT 30
-
-
-enum cell_type {
-    CELL_EMPTY = -1,
-    CELL_WALL = 637,
-    CELL_TREE1 = 50,
-
-    CELL_ENEMY = 34,
-    CELL_GEM = 4,
-    CELL_POTION = 5,
-    CELL_KEY = 6,
-    CELL_DOOR = 7,
-    CELL_MAX
-};
-typedef enum cell_type cell_type_t;
-
-enum sprites {
-    PLAYER_SPRITE = 27
-};
-typedef enum sprites sprites_t;
-
-struct entity {
-    int x;
-    int y;
-    sprites_t sprite;
-};
-typedef struct entity entity_t;
-
 // variables
-cell_type_t cells[CELLS_X *CELLS_Y];
-entity_t player = { 10, 10, PLAYER_SPRITE };
-float timer = 0.0f;
 
-entity_t enemies[10];
-// functions
+GameMap* game_map;
+Entity* player;
+Timer* timer;
 
-void set_cell(int x, int y, cell_type_t value) {
-    if (x >= 0 && x < CELLS_X && y >= 0 && y < CELLS_Y) {
-        cells[y * CELLS_X + x] = value;
-    }
-}
-
-cell_type_t get_cell(int x, int y) {
-    if (x >= 0 && x < CELLS_X && y >= 0 && y < CELLS_Y) {
-        return cells[y * CELLS_X + x];
-    }
-    return 0;
-}
+Entity enemies[10];
 
 
 void init_enemies() {
@@ -99,6 +55,8 @@ void init_enemies() {
         enemies[i].x = GetRandomValue(0, CELLS_X - 1);
         enemies[i].y = GetRandomValue(0, CELLS_Y - 1);
         enemies[i].sprite = CELL_ENEMY;
+        enemies[i].health = 100;
+        enemies[i].max_health = 100;
     }
 }
 
@@ -114,12 +72,17 @@ int main()
     Image image = LoadImage(ASSETS_PATH "sprites.png");     // Loaded in CPU memory (RAM)
     spritesTexture = LoadTextureFromImage(image);          // Image converted to texture, GPU memory (VRAM)
     UnloadImage(image);   // Once image has been converted to texture and uploaded to VRAM, it can be unloaded from RAM
-    timer = 0.1f;
+
+    game_map = gamemap_create(CELLS_X, CELLS_Y);
+    player = entity_create(10, 10, PLAYER_SPRITE,100);
+
+    timer = timer_create(0.1f, 0.0f, true);
     for (int i = 0; i < CELLS_X * CELLS_Y; i++) {
-        cells[i] = CELL_WALL;
+        gamemap_set_cell(game_map, i % CELLS_X, i / CELLS_X, CELL_WALL);
     }
 
-    set_cell(0, 0, CELL_TREE1);
+
+    gamemap_set_cell(game_map, 1, 1, CELL_TREE1);
 
     init_enemies();
 #if defined(PLATFORM_WEB)
@@ -137,22 +100,12 @@ int main()
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    gamemap_destroy(game_map);
+    timer_destroy(timer);
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
     return 0;
-}
-
-void draw_entity(entity_t e,bool draw_shadow) {
-    int sprite_x = e.sprite % SPRITESHET_WIDTH;
-    int sprite_y = e.sprite / SPRITESHET_WIDTH;
-    Rectangle source = { sprite_x*16, sprite_y*16, 16, 16 };
-    Rectangle dest = { e.x * 16 * SCALE, e.y * 16 * SCALE, 16 * SCALE, 16 * SCALE };
-    if (draw_shadow) {
-        DrawRectangle(e.x * 16 * SCALE, e.y * 16 * SCALE, 16 * SCALE, 16 * SCALE, (Color){0, 0, 0, 128});
-    }
-
-    DrawTexturePro(spritesTexture, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
 
 void draw_tile(int x, int y, int tile) {
@@ -168,23 +121,36 @@ void draw_tile(int x, int y, int tile) {
 //----------------------------------------------------------------------------------
 void UpdateDrawFrame(void)
 {
-    timer-= GetFrameTime();
+    timer_update(timer, -GetFrameTime());
 
-    if (timer <= 0) {
-        timer = 0.1f;
+
+    if (timer_expired(timer)) {
+
         // Get input
+        Vector2Int movement = {0, 0};
 
         if (IsKeyDown(KEY_RIGHT)) {
-            player.x++;
+            movement.x = 1;
         }
         if (IsKeyDown(KEY_LEFT)) {
-            player.x--;
+            movement.x = -1;
         }
         if (IsKeyDown(KEY_DOWN)) {
-            player.y++;
+            movement.y = 1;
         }
         if (IsKeyDown(KEY_UP)) {
-            player.y--;
+            movement.y = -1;
+        }
+
+        if (movement.x != 0 || movement.y != 0) {
+            Vector2Int new_pos = {player->x + movement.x, player->y + movement.y};
+            if (!IS_SOLID_CELL(gamemap_get_cell(game_map, new_pos.x, new_pos.y))) {
+                entity_move(player, movement);
+            } else {
+                TraceLog(LOG_INFO, "Collision");
+            }
+
+//            entity_move(player, movement);
         }
     }
 
@@ -194,17 +160,19 @@ void UpdateDrawFrame(void)
     // TODO: Update your variables here
     //----------------------------------------------------------------------------------
 
+    player->health -= 1;
+    if (player->health <= 0) {
+        player->health = player->max_health;
+    }
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
     ClearBackground(DARKGRAY);
-//    DrawTextureEx(spritesTexture, (Vector2){0, 0}, 0.0f, SCALE, WHITE);
-//    DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
     for (int y = 0; y < CELLS_Y; y++) {
         for (int x = 0; x < CELLS_X; x++) {
-            int cell = get_cell(x, y);
+            int cell = gamemap_get_cell(game_map, x, y);
             if (cell >= 0) {
                 draw_tile(x, y, cell);
             }
@@ -212,11 +180,11 @@ void UpdateDrawFrame(void)
     }
 
     // draw player
-    draw_entity(player,true);
+    entity_draw(player, &spritesTexture, true);
 
     // draw enemies
     for (int i = 0; i < 10; i++) {
-        draw_entity(enemies[i],true);
+        entity_draw(&enemies[i], &spritesTexture, true);
     }
 
     EndDrawing();

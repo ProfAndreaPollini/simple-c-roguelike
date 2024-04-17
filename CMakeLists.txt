@@ -26,7 +26,14 @@ endif()
 # Our Project
 
 add_executable(${PROJECT_NAME}
-        main.c)
+        main.c
+        timer.h
+        timer.c
+        entity.c
+        entity.h
+        constants.h
+        gamemap.c
+        gamemap.h)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
 
