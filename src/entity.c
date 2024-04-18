@@ -2,10 +2,10 @@
 // Created by profa on 17/04/2024.
 //
 
-#include "timer.h"
+#include "../timer.h"
 #include "raylib.h"
-#include "entity.h"
-#include "constants.h"
+#include "../include/entity.h"
+#include "../constants.h"
 
 #include <stdlib.h>
 

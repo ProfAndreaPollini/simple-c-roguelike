@@ -5,7 +5,7 @@
 #ifndef EXAMPLE_ENTITY_H
 #define EXAMPLE_ENTITY_H
 
-
+#include "raylib.h"
 
 enum sprites {
     PLAYER_SPRITE = 27

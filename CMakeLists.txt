@@ -29,13 +29,23 @@ add_executable(${PROJECT_NAME}
         main.c
         timer.h
         timer.c
-        entity.c
-        entity.h
+        src/entity.c
+#        include/entity.h
         constants.h
         gamemap.c
-        gamemap.h)
+#        gamemap.h
+        src/entity_list.c
+#        include/entity_list.h
+        src/tile_list.c
+#        include/tile_list.h
+        src/tile.c
+#        include/tile.h
+)
 #set(raylib_VERBOSE 1)
 target_link_libraries(${PROJECT_NAME} raylib)
+target_include_directories( ${PROJECT_NAME}
+        PUBLIC ${PROJECT_SOURCE_DIR}/include
+)
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")

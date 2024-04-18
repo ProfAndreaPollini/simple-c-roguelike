@@ -17,11 +17,13 @@
 *
 ********************************************************************************************/
 
+#include <stdlib.h>
 #include "raylib.h"
 #include "timer.h"
-#include "entity.h"
+#include "include/entity.h"
 #include "constants.h"
 #include "gamemap.h"
+#include "include/entity_list.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -46,17 +48,19 @@ Texture2D spritesTexture;
 GameMap* game_map;
 Entity* player;
 Timer* timer;
-
-Entity enemies[10];
+EntityList* enemies_list;
 
 
 void init_enemies() {
+    enemies_list = entity_list_create();
+    TileListIterator it = gamemap_get_tiles_by_type(game_map, CELL_FLOOR);
+
+
     for (int i = 0; i < 10; i++) {
-        enemies[i].x = GetRandomValue(0, CELLS_X - 1);
-        enemies[i].y = GetRandomValue(0, CELLS_Y - 1);
-        enemies[i].sprite = CELL_ENEMY;
-        enemies[i].health = 100;
-        enemies[i].max_health = 100;
+
+        TileListNode* node = tile_list_choose_random(&it);
+        Entity *enemy = entity_create(node->position.x,node->position.y, CELL_ENEMY, 100);
+        entity_list_add(enemies_list, enemy);
     }
 }
 
@@ -81,6 +85,15 @@ int main()
         gamemap_set_cell(game_map, i % CELLS_X, i / CELLS_X, CELL_WALL);
     }
 
+    gamemap_apply_random_walk(game_map, 100, 10, 10, 10);
+    TileListIterator it = gamemap_get_tiles_by_type(game_map, CELL_FLOOR);
+
+    TileListNode* node = tile_list_choose_random(&it);
+
+    if (node != NULL) {
+        player->x = node->position.x;
+        player->y = node->position.y;
+    }
 
     gamemap_set_cell(game_map, 1, 1, CELL_TREE1);
 
@@ -144,13 +157,13 @@ void UpdateDrawFrame(void)
 
         if (movement.x != 0 || movement.y != 0) {
             Vector2Int new_pos = {player->x + movement.x, player->y + movement.y};
-            if (!IS_SOLID_CELL(gamemap_get_cell(game_map, new_pos.x, new_pos.y))) {
+            if (!IS_SOLID_CELL(gamemap_get_cell(game_map, new_pos.x, new_pos.y)->type)) {
                 entity_move(player, movement);
             } else {
                 TraceLog(LOG_INFO, "Collision");
             }
 
-//            entity_move(player, movement);
+
         }
     }
 
@@ -172,9 +185,9 @@ void UpdateDrawFrame(void)
 
     for (int y = 0; y < CELLS_Y; y++) {
         for (int x = 0; x < CELLS_X; x++) {
-            int cell = gamemap_get_cell(game_map, x, y);
+            Tile* cell = gamemap_get_cell(game_map, x, y);
             if (cell >= 0) {
-                draw_tile(x, y, cell);
+                draw_tile(x, y, cell->type);
             }
         }
     }
@@ -182,9 +195,11 @@ void UpdateDrawFrame(void)
     // draw player
     entity_draw(player, &spritesTexture, true);
 
-    // draw enemies
-    for (int i = 0; i < 10; i++) {
-        entity_draw(&enemies[i], &spritesTexture, true);
+
+    EntityListNode* current = enemies_list->head;
+    while (current != NULL) {
+        entity_draw(current->entity, &spritesTexture, true);
+        current = current->next;
     }
 
     EndDrawing();
