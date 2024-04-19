@@ -8,6 +8,7 @@
 #include "raylib.h"
 
 enum sprites {
+    ENEMY_SPRITE = 34,
     PLAYER_SPRITE = 27
 };
 typedef enum sprites sprites_t;

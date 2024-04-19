@@ -59,7 +59,7 @@ void init_enemies() {
     for (int i = 0; i < 10; i++) {
 
         TileListNode* node = tile_list_choose_random(&it);
-        Entity *enemy = entity_create(node->position.x,node->position.y, CELL_ENEMY, 100);
+        Entity *enemy = entity_create(node->position.x,node->position.y, ENEMY_SPRITE, 100);
         entity_list_add(enemies_list, enemy);
     }
 }
@@ -124,7 +124,7 @@ int main()
 void draw_tile(int x, int y, int tile) {
     int tile_x = tile % SPRITESHET_WIDTH;
     int tile_y = tile / SPRITESHET_WIDTH;
-    Rectangle source = { tile_x*16, tile_y*16, 16, 16 };
+    Rectangle source = { tile_x*16.0f, tile_y*16.0f, 16.0f, 16.0f };
     Rectangle dest = { x * 16 * SCALE, y * 16 * SCALE, 16 * SCALE, 16 * SCALE };
     DrawTexturePro(spritesTexture, source, dest, (Vector2){0, 0}, 0.0f, WHITE);
 }
@@ -186,7 +186,7 @@ void UpdateDrawFrame(void)
     for (int y = 0; y < CELLS_Y; y++) {
         for (int x = 0; x < CELLS_X; x++) {
             Tile* cell = gamemap_get_cell(game_map, x, y);
-            if (cell >= 0) {
+            if (cell != NULL) {
                 draw_tile(x, y, cell->type);
             }
         }

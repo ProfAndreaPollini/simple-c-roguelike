@@ -2,7 +2,7 @@
 // Created by profa on 18/04/2024.
 //
 
-#include <malloc.h>
+#include <stdlib.h>
 #include "../include/tile_list.h"
 
 TileList *tile_list_create() {

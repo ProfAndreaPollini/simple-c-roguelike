@@ -10,7 +10,7 @@ enum cell_type {
     CELL_WALL = 637,
     CELL_TREE1 = 50,
 
-    CELL_ENEMY = 34,
+
     CELL_FLOOR = 16,
     CELL_GEM = 4,
     CELL_POTION = 5,

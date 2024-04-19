@@ -2,7 +2,7 @@
 // Created by profa on 18/04/2024.
 //
 
-#include <malloc.h>
+#include <stdlib.h>
 #include "../include/entity_list.h"
 
 EntityList *entity_list_create() {
